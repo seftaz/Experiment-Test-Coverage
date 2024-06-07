@@ -1,10 +1,11 @@
 package com.unittest.codecoverage;
 
+import com.unittest.codecoverage.exceptions.BehaviorException;
 import com.unittest.codecoverage.exceptions.PersonException;
-import com.unittest.codecoverage.models.Gender;
-import com.unittest.codecoverage.models.Person;
+import com.unittest.codecoverage.models.*;
 import com.unittest.codecoverage.repositories.PersonRepository;
 import com.unittest.codecoverage.services.impl.PersonServiceImpl;
+import com.unittest.codecoverage.services.impl.TrafficBehaviorServiceImpl;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.matchers.Null;
@@ -14,6 +15,44 @@ import org.springframework.util.Assert.*;
 
 //@SpringBootTest
 class CodecoverageApplicationTests {
+
+    @Test
+    void checkingTrafficService() {
+        Footpassenger footpassenger = new Footpassenger();
+        footpassenger.setCrossedTrafficLigth(TrafficLigth.RED);
+        footpassenger.setLookedToTheLeft(false);
+        footpassenger.setLookedToTheRight(false);
+        footpassenger.setCrossedTheRoad(false);
+
+        Traffic traffic = new Traffic();
+        traffic.setCurrentTrafficLight(TrafficLigth.GREEN);
+        traffic.setIntenseCarTraffic(true);
+        traffic.setStreetDirectionFlow(StreetDirectionFlow.TWO_WAY);
+
+        TrafficBehaviorServiceImpl trafficBehaviorService = new TrafficBehaviorServiceImpl();
+        trafficBehaviorService.footpassengerCrossTheStreet(traffic, footpassenger);
+        footpassenger.setCrossedTheRoad(true);
+        try {
+            trafficBehaviorService.footpassengerCrossTheStreet(traffic, footpassenger);
+        } catch (BehaviorException e){
+            Assert.isTrue(e.getMessage().equals("You should'nt do that, reckless person"));
+        }
+
+        footpassenger.setCrossedTrafficLigth(TrafficLigth.GREEN);
+        traffic.setCurrentTrafficLight(TrafficLigth.RED);
+
+        try {
+            trafficBehaviorService.footpassengerCrossTheStreet(traffic, footpassenger);
+        } catch (BehaviorException e){
+            Assert.isTrue(e.getMessage().equals("You should be more careful"));
+        }
+    }
+
+
+
+
+
+
 
     @Test
     void createValidatePerson() {
